@@ -1,62 +1,56 @@
 [
   {
-    "name": "Sidney Wreight",
+    "username": "sidney",
     "email": "swreight0@mozilla.org",
     "password": "KcRwv7jrVf",
     "role": "user"
   },
   {
-    "name": "Gothart Philippard",
+    "username": "gothart",
     "email": "gphilippard1@theguardian.com",
     "password": "u4I218n",
     "role": "user"
   },
   {
-    "name": "Amble Law",
+    "username": "amble",
     "email": "alaw2@time.com",
-    "password": "K55jrHdFWEt3",
+    "password": "123456",
     "role": "user"
   },
   {
-    "name": "Ali Kiddye",
+    "username": "ali",
     "email": "akiddye3@opensource.org",
     "password": "kBrG5cGN1JP",
     "role": "user"
   },
   {
-    "name": "Roxie Waldren",
+    "username": "roxie",
     "email": "rwaldren4@theglobeandmail.com",
     "password": "7C7a1RrfQ",
     "role": "user"
   },
   {
-    "name": "Ardith Mendes",
+    "username": "ardith",
     "email": "amendes5@usda.gov",
     "password": "X8Zfcu",
     "role": "admin"
   },
   {
-    "name": "Krisha Casino",
+    "username": "krisha",
     "email": "kcasino6@google.pl",
     "password": "1UMoFi8a",
     "role": "admin"
   },
   {
-    "name": "Lorie Ahrend",
+    "username": "lorie",
     "email": "lahrend7@alibaba.com",
     "password": "s5Fynloq",
     "role": "admin"
   },
   {
-    "name": "Edin Bernli",
-    "email": "ebernli8@earthlink.net",
-    "password": "emQ08I",
-    "role": "admin"
-  },
-  {
-    "name": "Pearl Reiglar",
-    "email": "preiglar9@wunderground.com",
-    "password": "qu7yPqZ",
+    "username": "reagan",
+    "email": "techreagan@gmail.com",
+    "password": "123456",
     "role": "admin"
   }
 ]
