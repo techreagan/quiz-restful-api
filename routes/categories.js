@@ -16,7 +16,7 @@ const advancedResults = require('../middleware/advancedResults')
 const { protect, authorize } = require('../middleware/auth')
 
 router.use(protect)
-router.use(authorize('admin'))
+// router.use()
 
 router
   .route('/')
@@ -26,9 +26,9 @@ router
 router
   .route('/:id')
   .get(getCategory)
-  .put(updateCategory)
-  .delete(deleteCategory)
+  .put(authorize('admin'), updateCategory)
+  .delete(authorize('admin'), deleteCategory)
 
-router.route('/:id/photo').put(categoryPhotoUpload)
+router.route('/:id/photo').put(authorize('admin'), categoryPhotoUpload)
 
 module.exports = router
