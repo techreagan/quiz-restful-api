@@ -22,6 +22,7 @@ DBConnection()
 const authRoutes = require('./routes/auth')
 const userRoutes = require('./routes/users')
 const categoriesRoutes = require('./routes/categories')
+const questionsRoutes = require('./routes/questions')
 
 const app = express()
 
@@ -64,6 +65,7 @@ const versionOne = routeName => `/api/v1/${routeName}`
 app.use(versionOne('auth'), authRoutes)
 app.use(versionOne('users'), userRoutes)
 app.use(versionOne('categories'), categoriesRoutes)
+app.use(versionOne('questions'), questionsRoutes)
 
 app.use(errorHandler)
 

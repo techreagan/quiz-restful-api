@@ -1,4 +1,5 @@
 const mongoose = require('mongoose')
+const Question = require('./Question')
 
 const Schema = mongoose.Schema
 
@@ -20,13 +21,22 @@ const CategorySchema = new Schema(
       type: String,
       default: 'no-photo.jpg'
     },
+
     user: {
       type: mongoose.Schema.ObjectId,
       ref: 'User',
       required: true
     }
   },
-  { timestamps: true }
+  { toJSON: { virtuals: true }, toObject: { virtuals: true }, timestamps: true }
 )
+
+CategorySchema.virtual('questions', {
+  ref: 'Question',
+  localField: '_id',
+  foreignField: 'category',
+  justOne: false,
+  count: true
+})
 
 module.exports = mongoose.model('Category', CategorySchema)
