@@ -1,5 +1,4 @@
 const mongoose = require('mongoose')
-const Question = require('./Question')
 
 const Schema = mongoose.Schema
 
