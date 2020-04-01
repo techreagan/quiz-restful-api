@@ -35,13 +35,13 @@ exports.createCategory = asyncHandler(async (req, res, next) => {
   if (category) {
     return next(new ErrorResponse('Title already exists', 400))
   }
-  category = await Category.create({
-    ...req.body,
-    user: req.user.id
-  })
 
   if (!req.files || !req.files.photo) {
     // return next(new ErrorResponse(`Please upload a photo`, 404))
+    category = await Category.create({
+      ...req.body,
+      user: req.user.id
+    })
 
     return res.status(200).json({ sucess: true, data: category })
   }
@@ -62,6 +62,11 @@ exports.createCategory = asyncHandler(async (req, res, next) => {
       )
     )
   }
+
+  category = await Category.create({
+    ...req.body,
+    user: req.user.id
+  })
 
   photo.name = `photo-${category._id}${path.parse(photo.name).ext}`
 
@@ -159,7 +164,7 @@ exports.updateCategory = asyncHandler(async (req, res, next) => {
           }
 
           data.photo = photo.name
-          console.log(data)
+
           await data.save()
 
           res.status(200).json({ success: true, data })
