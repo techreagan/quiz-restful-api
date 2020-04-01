@@ -65,8 +65,9 @@ app.use(cors())
 // Prevent http param pollution
 app.use(hpp())
 
+app.use(express.static(path.join(__dirname, 'public')))
+
 const versionOne = routeName => `/api/v1/${routeName}`
-const versionTwo = routeName => `/api/v2/${routeName}`
 
 app.use(versionOne('auth'), authRoutes)
 app.use(versionOne('users'), userRoutes)
