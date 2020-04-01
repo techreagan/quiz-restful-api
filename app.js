@@ -36,7 +36,11 @@ if (process.env.NODE_ENV === 'development') {
 }
 
 // File uploading
-app.use(fileupload())
+app.use(
+  fileupload({
+    createParentPath: true
+  })
+)
 
 // Sanitize data
 app.use(mongoSanitize())

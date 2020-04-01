@@ -35,7 +35,6 @@ exports.createCategory = asyncHandler(async (req, res, next) => {
   if (category) {
     return next(new ErrorResponse('Title already exists', 400))
   }
-
   category = await Category.create({
     ...req.body,
     user: req.user.id
@@ -69,6 +68,7 @@ exports.createCategory = asyncHandler(async (req, res, next) => {
   photo.mv(`${process.env.FILE_UPLOAD_PATH}/${photo.name}`, async err => {
     if (err) {
       console.error(err)
+      await Category.findByIdAndDelete(category._id)
       return next(new ErrorResponse(`Problem with photo upload`, 500))
     }
 
@@ -78,7 +78,7 @@ exports.createCategory = asyncHandler(async (req, res, next) => {
       { new: true }
     )
 
-    res.status(200).json({ success: true, data: category })
+    return res.status(200).json({ success: true, data: category })
   })
 })
 
@@ -176,6 +176,40 @@ exports.updateCategory = asyncHandler(async (req, res, next) => {
 // @access  Private/Admin
 exports.deleteCategory = asyncHandler(async (req, res, next) => {
   // const category = await Category.findByIdAndDelete(req.params.id)
+  let category = await Category.findById(req.params.id)
+
+  if (!category) {
+    return next(new ErrorResponse(`No category with id of ${req.params.id}`))
+  }
+
+  if (category && category.photo !== 'no-photo.jpg') {
+    fs.unlink(
+      `${process.env.FILE_UPLOAD_PATH}/${category.photo}`,
+      async err => {
+        await category.remove()
+        if (err) {
+          return next(
+            new ErrorResponse(
+              `Something went wrong, couldn't delete category photo`,
+              500
+            )
+          )
+        }
+
+        return res.status(200).json({ success: true, category })
+      }
+    )
+  } else {
+    await category.remove()
+    return res.status(200).json({ success: true, category })
+  }
+})
+
+// @desc    Delete Category
+// @route   DELETE /api/v1/categories/:id
+// @access  Private/Admin
+exports.deleteCategory1 = asyncHandler(async (req, res, next) => {
+  // const category = await Category.findByIdAndDelete(req.params.id)
   const category = await Category.findOneAndDelete(
     { _id: req.params.id },
     function(err, data) {
@@ -195,7 +229,12 @@ exports.deleteCategory = asyncHandler(async (req, res, next) => {
       if (data && data.photo !== 'no-photo.jpg') {
         fs.unlink(`${process.env.FILE_UPLOAD_PATH}/${data.photo}`, err => {
           if (err) {
-            return next(new ErrorResponse(`Something went wrong`, 500))
+            return next(
+              new ErrorResponse(
+                `Something went wrong, couldn't delete category photo`,
+                500
+              )
+            )
           }
           return res.status(200).json({ success: true, data })
         })

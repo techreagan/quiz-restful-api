@@ -38,4 +38,13 @@ CategorySchema.virtual('questions', {
   count: true
 })
 
+// Cascade delete questions & scores when a category is deleted
+CategorySchema.pre('remove', async function(next) {
+  // console.log(`Question being removed from category ${this._id}`)
+  await this.model('Question').deleteMany({ category: this._id })
+  // console.log(`Score being removed from category ${this._id}`)
+  await this.model('Score').deleteMany({ category: this._id })
+  next()
+})
+
 module.exports = mongoose.model('Category', CategorySchema)
