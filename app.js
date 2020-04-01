@@ -62,6 +62,7 @@ app.use(cors())
 app.use(hpp())
 
 const versionOne = routeName => `/api/v1/${routeName}`
+const versionTwo = routeName => `/api/v2/${routeName}`
 
 app.use(versionOne('auth'), authRoutes)
 app.use(versionOne('users'), userRoutes)

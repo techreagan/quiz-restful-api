@@ -1,4 +1,5 @@
 const path = require('path')
+const fs = require('fs')
 const asyncHandler = require('../middleware/async')
 const ErrorResponse = require('../utils/errorResponse')
 const Category = require('../models/Category')
@@ -40,36 +41,169 @@ exports.createCategory = asyncHandler(async (req, res, next) => {
     user: req.user.id
   })
 
-  res.status(200).json({ sucess: true, data: category })
+  if (!req.files || !req.files.photo) {
+    // return next(new ErrorResponse(`Please upload a photo`, 404))
+
+    return res.status(200).json({ sucess: true, data: category })
+  }
+
+  const photo = req.files.photo
+
+  if (!photo.mimetype.startsWith('image')) {
+    return next(new ErrorResponse(`Please upload an image photo`, 404))
+  }
+
+  if (photo.size > process.env.MAX_FILE_UPLOAD) {
+    return next(
+      new ErrorResponse(
+        `Please upload an image less than ${process.env.MAX_FILE_UPLOAD /
+          1000 /
+          1000}mb`,
+        404
+      )
+    )
+  }
+
+  photo.name = `photo-${category._id}${path.parse(photo.name).ext}`
+
+  photo.mv(`${process.env.FILE_UPLOAD_PATH}/${photo.name}`, async err => {
+    if (err) {
+      console.error(err)
+      return next(new ErrorResponse(`Problem with photo upload`, 500))
+    }
+
+    category = await Category.findByIdAndUpdate(
+      category._id,
+      { photo: photo.name },
+      { new: true }
+    )
+
+    res.status(200).json({ success: true, data: category })
+  })
 })
 
 // @desc    Update Category
 // @route   PUT /api/v1/categories/:id
 // @access  Private/Admin
 exports.updateCategory = asyncHandler(async (req, res, next) => {
-  const category = await Category.findByIdAndUpdate(req.params.id, req.body, {
-    runValidators: true,
-    new: true
-  })
+  let category = await Category.findOneAndUpdate(
+    { _id: req.params.id },
+    req.body,
+    { new: true, runValidators: true },
+    function(err, data) {
+      if (err) {
+        // next(err)
+        console.log(err)
+        return next(
+          new ErrorResponse(
+            err.code == 11000
+              ? 'Title already exists'
+              : `Something went wrong with updating the image`
+          )
+        )
+      }
 
-  if (!category) {
-    return next(new ErrorResponse(`No category with id of ${req.params.id}`))
-  }
+      if (!data) {
+        return next(
+          new ErrorResponse(`No category with id of ${req.params.id}`)
+        )
+      }
 
-  res.status(200).json({ sucess: true, data: category })
+      if (req.files) {
+        // console.log('el')
+        const photo = req.files.photo
+
+        if (!photo) {
+          return next(new ErrorResponse('Photo field is required', 400))
+        }
+
+        if (!photo.mimetype.startsWith('image')) {
+          return next(new ErrorResponse(`Please upload an image photo`, 404))
+        }
+
+        if (photo.size > process.env.MAX_FILE_UPLOAD) {
+          return next(
+            new ErrorResponse(
+              `Please upload an image less than ${process.env.MAX_FILE_UPLOAD /
+                1000 /
+                1000}mb`,
+              404
+            )
+          )
+        }
+
+        photo.name = `photo-${data._id}${path.parse(photo.name).ext}`
+
+        if (data.photo !== 'no-photo.jpg') {
+          // fs.unlinkSync
+          fs.unlinkSync(
+            `${process.env.FILE_UPLOAD_PATH}/${data.photo}`,
+            err => {
+              if (err) {
+                return next(
+                  new ErrorResponse(
+                    `Something went wrong with updating the image`,
+                    500
+                  )
+                )
+              }
+              // return res.status(200).json({ success: true, data })
+            }
+          )
+        }
+
+        photo.mv(`${process.env.FILE_UPLOAD_PATH}/${photo.name}`, async err => {
+          if (err) {
+            console.error(err)
+            return next(new ErrorResponse(`Problem with photo upload`, 500))
+          }
+
+          data.photo = photo.name
+          console.log(data)
+          await data.save()
+
+          res.status(200).json({ success: true, data })
+        })
+      } else {
+        return res.status(200).json({ sucess: true, data: data })
+      }
+    }
+  )
 })
 
 // @desc    Delete Category
 // @route   DELETE /api/v1/categories/:id
 // @access  Private/Admin
 exports.deleteCategory = asyncHandler(async (req, res, next) => {
-  const category = await Category.findByIdAndDelete(req.params.id)
+  // const category = await Category.findByIdAndDelete(req.params.id)
+  const category = await Category.findOneAndDelete(
+    { _id: req.params.id },
+    function(err, data) {
+      // console.log(data)
+      if (err) {
+        return next(
+          new ErrorResponse(`No category with id of ${req.params.id}`)
+        )
+      }
 
-  if (!category) {
-    return next(new ErrorResponse(`No category with id of ${req.params.id}`))
-  }
+      if (!data) {
+        return next(
+          new ErrorResponse(`No category with id of ${req.params.id}`)
+        )
+      }
 
-  res.status(200).json({ success: true, data: category })
+      if (data && data.photo !== 'no-photo.jpg') {
+        fs.unlink(`${process.env.FILE_UPLOAD_PATH}/${data.photo}`, err => {
+          if (err) {
+            return next(new ErrorResponse(`Something went wrong`, 500))
+          }
+          return res.status(200).json({ success: true, data })
+        })
+      } else {
+        res.status(200).json({ success: true, data })
+      }
+    }
+  )
 })
 
 // @desc    Upload photo for category

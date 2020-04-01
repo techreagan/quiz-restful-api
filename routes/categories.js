@@ -20,7 +20,7 @@ router.use(protect)
 
 router
   .route('/')
-  .get(advancedResults(Category, 'questions'), getCategories)
+  .get(advancedResults(Category, [{ path: 'questions' }]), getCategories)
   .post(createCategory)
 
 router
