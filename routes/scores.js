@@ -2,6 +2,7 @@ const express = require('express')
 const {
   getScore,
   getScores,
+  getScoreByCategory,
   createScore,
   deleteScore
 } = require('../controllers/scores')
@@ -28,5 +29,7 @@ router
   .route('/:id')
   .get(getScore)
   .delete(authorize('admin'), deleteScore)
+
+router.route('/:id/category').get(getScoreByCategory)
 
 module.exports = router

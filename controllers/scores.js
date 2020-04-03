@@ -12,13 +12,33 @@ exports.getScores = asyncHandler(async (req, res, next) => {
 })
 
 // @desc    Get single score
-// @route   GET /api/v1/score/:id
+// @route   GET /api/v1/score/:id/
 // @access  Private/Admin
 exports.getScore = asyncHandler(async (req, res, next) => {
   const score = await Score.findById(req.params.id)
 
   if (!score) {
     return next(new ErrorResponse(`No score with that id of ${req.params.id}`))
+  }
+
+  res.status(200).json({ success: true, data: score })
+})
+
+// @desc    Get single score
+// @route   GET /api/v1/score/:id/category
+// @access  Private/Admin
+exports.getScoreByCategory = asyncHandler(async (req, res, next) => {
+  const score = await Score.findOne({
+    category: req.params.id,
+    user: req.user.id
+  })
+
+  if (!score) {
+    return next(
+      new ErrorResponse(
+        `No score for that category with that id of ${req.params.id}`
+      )
+    )
   }
 
   res.status(200).json({ success: true, data: score })
