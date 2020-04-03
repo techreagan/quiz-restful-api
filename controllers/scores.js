@@ -2,6 +2,8 @@ const asyncHandler = require('../middleware/async')
 const ErrorResponse = require('../utils/errorResponse')
 const Score = require('../models/Score')
 const Category = require('../models/Category')
+const User = require('../models/User')
+const LeaderBoard = require('../models/LeaderBoard')
 
 // @desc    Get scores
 // @route   GET /api/v1/scores
@@ -68,11 +70,11 @@ exports.createScore = asyncHandler(async (req, res, next) => {
 
   if (!category) {
     return next(
-      new ErrorResponse(`No category with that id of ${req.params.id}`)
+      new ErrorResponse(`No category with that id of ${req.body.category}`)
     )
   }
 
-  let score = await Score.findOneAndUpdate(
+  const score = await Score.findOneAndUpdate(
     { category, user: req.user.id },
     { score: req.body.score },
     { upsert: true, new: true, runValidators: true }
@@ -81,6 +83,20 @@ exports.createScore = asyncHandler(async (req, res, next) => {
   if (!score) {
     return next(new ErrorResponse(`Something went wrong`, 500))
   }
+  const scores = await Score.find({ user: req.user.id })
+  let totalScore = 0
+
+  if (scores) {
+    scores.forEach(score => {
+      totalScore += score.score
+    })
+  }
+
+  await LeaderBoard.findOneAndUpdate(
+    { user: req.user.id },
+    { totalScore },
+    { upsert: true, new: true, runValidators: true }
+  )
 
   res.status(200).json({ success: true, data: score })
 })
