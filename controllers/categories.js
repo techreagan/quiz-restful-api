@@ -3,6 +3,7 @@ const fs = require('fs')
 const asyncHandler = require('../middleware/async')
 const ErrorResponse = require('../utils/errorResponse')
 const Category = require('../models/Category')
+const Question = require('../models/Question')
 
 // @desc    Get categories
 // @route   GET /api/v1/categories
@@ -22,6 +23,12 @@ exports.getCategory = asyncHandler(async (req, res, next) => {
       new ErrorResponse(`No category with that id of ${req.params.id}`)
     )
   }
+
+  const question = await Question.findOne({
+    category: category._id
+  }).countDocuments()
+
+  category._doc.question = question
 
   res.status(200).json({ sucess: true, data: category })
 })
