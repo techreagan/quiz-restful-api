@@ -21,7 +21,7 @@ router.use(protect)
 router
   .route('/')
   .get(advancedResults(Category, [{ path: 'questions' }]), getCategories)
-  .post(createCategory)
+  .post(authorize('admin'), createCategory)
 
 router
   .route('/:id')
