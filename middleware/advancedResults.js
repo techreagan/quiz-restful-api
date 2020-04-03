@@ -34,7 +34,9 @@ const advancedResults = (model, populates) => async (req, res, next) => {
   const total = await model.countDocuments()
   const totalPage = Math.ceil(total / limit)
 
-  query = query.skip(startIndex).limit(limit)
+  if (parseInt(req.query.limit) !== 0) {
+    query = query.skip(startIndex).limit(limit)
+  }
 
   if (populates) {
     populates.forEach(populate => {
@@ -61,12 +63,19 @@ const advancedResults = (model, populates) => async (req, res, next) => {
     }
   }
 
-  res.advancedResults = {
-    success: true,
-    count: results.length,
-    totalPage,
-    pagination,
-    data: results
+  if (parseInt(req.query.limit) !== 0) {
+    res.advancedResults = {
+      success: true,
+      count: results.length,
+      totalPage,
+      pagination,
+      data: results
+    }
+  } else {
+    res.advancedResults = {
+      success: true,
+      data: results
+    }
   }
   next()
 }
