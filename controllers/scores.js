@@ -34,11 +34,7 @@ exports.getScoreByCategory = asyncHandler(async (req, res, next) => {
   })
 
   if (!score) {
-    return next(
-      new ErrorResponse(
-        `No score for that category with that id of ${req.params.id}`
-      )
-    )
+    return res.status(200).json({ success: true, data: { score: 0 } })
   }
 
   res.status(200).json({ success: true, data: score })
