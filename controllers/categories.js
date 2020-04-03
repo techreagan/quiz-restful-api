@@ -184,7 +184,9 @@ exports.deleteCategory = asyncHandler(async (req, res, next) => {
   let category = await Category.findById(req.params.id)
 
   if (!category) {
-    return next(new ErrorResponse(`No category with id of ${req.params.id}`))
+    return next(
+      new ErrorResponse(`No category with id of ${req.params.id}`, 404)
+    )
   }
 
   if (category && category.photo !== 'no-photo.jpg') {
