@@ -74,14 +74,18 @@ exports.createScore = asyncHandler(async (req, res, next) => {
     )
   }
 
-  const score = await Score.findOneAndUpdate(
-    { category, user: req.user.id },
-    { score: req.body.score },
-    { upsert: true, new: true, runValidators: true }
-  )
+  let score = await Score.findOne({ category, user: req.user.id })
 
-  if (!score) {
-    return next(new ErrorResponse(`Something went wrong`, 500))
+  if (score.score < parseInt(req.body.score)) {
+    score = await Score.findOneAndUpdate(
+      { category, user: req.user.id },
+      { score: req.body.score },
+      { upsert: true, new: true, runValidators: true }
+    )
+
+    if (!score) {
+      return next(new ErrorResponse(`Something went wrong`, 500))
+    }
   }
   const scores = await Score.find({ user: req.user.id })
   let totalScore = 0

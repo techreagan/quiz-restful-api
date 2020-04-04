@@ -20,14 +20,15 @@ router.use(protect)
 router
   .route('/')
   .get(
+    authorize('admin'),
     advancedResults(Score, [{ path: 'category' }, { path: 'user' }]),
     getScores
   )
-  .post(createScore)
+  .post(authorize('user'), createScore)
 
 router
   .route('/:id')
-  .get(getScore)
+  .get(authorize('admin'), getScore)
   .delete(authorize('admin'), deleteScore)
 
 router.route('/:id/category').get(getScoreByCategory)
