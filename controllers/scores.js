@@ -31,7 +31,7 @@ exports.getScore = asyncHandler(async (req, res, next) => {
 exports.getScoreByCategory = asyncHandler(async (req, res, next) => {
   const score = await Score.findOne({
     category: req.params.id,
-    user: req.user.id
+    user: req.user.id,
   })
 
   if (!score) {
@@ -62,10 +62,6 @@ exports.createScore = asyncHandler(async (req, res, next) => {
     return next(new ErrorResponse(`Category is required`, 404))
   }
 
-  if (!req.body.score) {
-    return next(new ErrorResponse(`Score is required`, 404))
-  }
-
   const category = await Category.findById(req.body.category)
 
   if (!category) {
@@ -75,6 +71,8 @@ exports.createScore = asyncHandler(async (req, res, next) => {
   }
 
   let score = await Score.findOne({ category, user: req.user.id })
+
+  req.body.score = req.body.score ? req.body.score : 0
 
   if (score.score < parseInt(req.body.score)) {
     score = await Score.findOneAndUpdate(
@@ -91,7 +89,7 @@ exports.createScore = asyncHandler(async (req, res, next) => {
   let totalScore = 0
 
   if (scores) {
-    scores.forEach(score => {
+    scores.forEach((score) => {
       totalScore += score.score
     })
   }
