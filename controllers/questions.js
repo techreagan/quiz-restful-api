@@ -21,7 +21,7 @@ exports.getQuestion = asyncHandler(async (req, res, next) => {
     )
   }
 
-  res.status(200).json({ sucess: true, data: question })
+  res.status(200).json({ success: true, data: question })
 })
 
 // @desc    Create question
@@ -41,7 +41,7 @@ exports.createQuestion = asyncHandler(async (req, res, next) => {
     user: req.user.id
   })
 
-  res.status(200).json({ sucess: true, data: question })
+  res.status(200).json({ success: true, data: question })
 })
 
 // @desc    Update Question
@@ -57,7 +57,7 @@ exports.updateQuestion = asyncHandler(async (req, res, next) => {
     return next(new ErrorResponse(`No question with id of ${req.params.id}`))
   }
 
-  res.status(200).json({ sucess: true, data: question })
+  res.status(200).json({ success: true, data: question })
 })
 
 // @desc    Delete question

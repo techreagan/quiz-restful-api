@@ -30,7 +30,7 @@ exports.getCategory = asyncHandler(async (req, res, next) => {
 
   category._doc.question = question
 
-  res.status(200).json({ sucess: true, data: category })
+  res.status(200).json({ success: true, data: category })
 })
 
 // @desc    Create Category
@@ -50,7 +50,7 @@ exports.createCategory = asyncHandler(async (req, res, next) => {
       user: req.user.id
     })
 
-    return res.status(200).json({ sucess: true, data: category })
+    return res.status(200).json({ success: true, data: category })
   }
 
   const photo = req.files.photo
@@ -62,9 +62,9 @@ exports.createCategory = asyncHandler(async (req, res, next) => {
   if (photo.size > process.env.MAX_FILE_UPLOAD) {
     return next(
       new ErrorResponse(
-        `Please upload an image less than ${process.env.MAX_FILE_UPLOAD /
-          1000 /
-          1000}mb`,
+        `Please upload an image less than ${
+          process.env.MAX_FILE_UPLOAD / 1000 / 1000
+        }mb`,
         404
       )
     )
@@ -77,7 +77,7 @@ exports.createCategory = asyncHandler(async (req, res, next) => {
 
   photo.name = `photo-${category._id}${path.parse(photo.name).ext}`
 
-  photo.mv(`${process.env.FILE_UPLOAD_PATH}/${photo.name}`, async err => {
+  photo.mv(`${process.env.FILE_UPLOAD_PATH}/${photo.name}`, async (err) => {
     if (err) {
       console.error(err)
       await Category.findByIdAndDelete(category._id)
@@ -102,7 +102,7 @@ exports.updateCategory = asyncHandler(async (req, res, next) => {
     { _id: req.params.id },
     req.body,
     { new: true, runValidators: true },
-    function(err, data) {
+    function (err, data) {
       if (err) {
         // next(err)
         console.log(err)
@@ -136,9 +136,9 @@ exports.updateCategory = asyncHandler(async (req, res, next) => {
         if (photo.size > process.env.MAX_FILE_UPLOAD) {
           return next(
             new ErrorResponse(
-              `Please upload an image less than ${process.env.MAX_FILE_UPLOAD /
-                1000 /
-                1000}mb`,
+              `Please upload an image less than ${
+                process.env.MAX_FILE_UPLOAD / 1000 / 1000
+              }mb`,
               404
             )
           )
@@ -150,7 +150,7 @@ exports.updateCategory = asyncHandler(async (req, res, next) => {
           // fs.unlinkSync
           fs.unlinkSync(
             `${process.env.FILE_UPLOAD_PATH}/${data.photo}`,
-            err => {
+            (err) => {
               if (err) {
                 return next(
                   new ErrorResponse(
@@ -164,20 +164,23 @@ exports.updateCategory = asyncHandler(async (req, res, next) => {
           )
         }
 
-        photo.mv(`${process.env.FILE_UPLOAD_PATH}/${photo.name}`, async err => {
-          if (err) {
-            console.error(err)
-            return next(new ErrorResponse(`Problem with photo upload`, 500))
+        photo.mv(
+          `${process.env.FILE_UPLOAD_PATH}/${photo.name}`,
+          async (err) => {
+            if (err) {
+              console.error(err)
+              return next(new ErrorResponse(`Problem with photo upload`, 500))
+            }
+
+            data.photo = photo.name
+
+            await data.save()
+
+            res.status(200).json({ success: true, data })
           }
-
-          data.photo = photo.name
-
-          await data.save()
-
-          res.status(200).json({ success: true, data })
-        })
+        )
       } else {
-        return res.status(200).json({ sucess: true, data: data })
+        return res.status(200).json({ success: true, data: data })
       }
     }
   )
@@ -199,7 +202,7 @@ exports.deleteCategory = asyncHandler(async (req, res, next) => {
   if (category && category.photo !== 'no-photo.jpg') {
     fs.unlink(
       `${process.env.FILE_UPLOAD_PATH}/${category.photo}`,
-      async err => {
+      async (err) => {
         await category.remove()
         if (err) {
           return next(
@@ -226,7 +229,7 @@ exports.deleteCategory1 = asyncHandler(async (req, res, next) => {
   // const category = await Category.findByIdAndDelete(req.params.id)
   const category = await Category.findOneAndDelete(
     { _id: req.params.id },
-    function(err, data) {
+    function (err, data) {
       // console.log(data)
       if (err) {
         return next(
@@ -241,7 +244,7 @@ exports.deleteCategory1 = asyncHandler(async (req, res, next) => {
       }
 
       if (data && data.photo !== 'no-photo.jpg') {
-        fs.unlink(`${process.env.FILE_UPLOAD_PATH}/${data.photo}`, err => {
+        fs.unlink(`${process.env.FILE_UPLOAD_PATH}/${data.photo}`, (err) => {
           if (err) {
             return next(
               new ErrorResponse(
@@ -283,9 +286,9 @@ exports.categoryPhotoUpload = asyncHandler(async (req, res, next) => {
   if (photo.size > process.env.MAX_FILE_UPLOAD) {
     return next(
       new ErrorResponse(
-        `Please upload an image less than ${process.env.MAX_FILE_UPLOAD /
-          1000 /
-          1000}mb`,
+        `Please upload an image less than ${
+          process.env.MAX_FILE_UPLOAD / 1000 / 1000
+        }mb`,
         404
       )
     )
@@ -293,7 +296,7 @@ exports.categoryPhotoUpload = asyncHandler(async (req, res, next) => {
 
   photo.name = `photo-${category._id}${path.parse(photo.name).ext}`
 
-  photo.mv(`${process.env.FILE_UPLOAD_PATH}/${photo.name}`, async err => {
+  photo.mv(`${process.env.FILE_UPLOAD_PATH}/${photo.name}`, async (err) => {
     if (err) {
       console.error(err)
       return next(new ErrorResponse(`Problem with photo upload`, 500))

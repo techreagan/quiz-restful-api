@@ -26,6 +26,7 @@ const categoriesRoutes = require('./routes/categories')
 const questionsRoutes = require('./routes/questions')
 const scoresRoutes = require('./routes/scores')
 const leaderBoardRoutes = require('./routes/leaderboard')
+const countRoutes = require('./routes/counts')
 
 const app = express()
 
@@ -69,7 +70,7 @@ app.use(hpp())
 
 app.use(express.static(path.join(__dirname, 'public')))
 
-const versionOne = routeName => `/api/v1/${routeName}`
+const versionOne = (routeName) => `/api/v1/${routeName}`
 
 app.use(versionOne('auth'), authRoutes)
 app.use(versionOne('users'), userRoutes)
@@ -77,6 +78,7 @@ app.use(versionOne('categories'), categoriesRoutes)
 app.use(versionOne('questions'), questionsRoutes)
 app.use(versionOne('scores'), scoresRoutes)
 app.use(versionOne('leaderboard'), leaderBoardRoutes)
+app.use(versionOne('counts'), countRoutes)
 
 app.use(errorHandler)
 
