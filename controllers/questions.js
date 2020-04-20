@@ -1,6 +1,7 @@
 const asyncHandler = require('../middleware/async')
 const ErrorResponse = require('../utils/errorResponse')
 const Question = require('../models/Question')
+const Category = require('../models/Category')
 
 // @desc    Get questions
 // @route   GET /api/v1/questions
@@ -32,6 +33,14 @@ exports.createQuestion = asyncHandler(async (req, res, next) => {
 
   if (question) {
     return next(new ErrorResponse('Question already exists', 400))
+  }
+
+  const category = await Category.findById(req.body.category)
+
+  if (!category) {
+    return next(
+      new ErrorResponse(`No category with id of ${req.body.category}`)
+    )
   }
 
   if (req.body.type === 'tf') delete req.body.options
