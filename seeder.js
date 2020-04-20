@@ -16,7 +16,12 @@ mongoose.connect(process.env.MONGO_URI, {
 })
 
 const users = JSON.parse(
-  fs.readFileSync(`${__dirname}/_data/users.json`, 'utf-8')
+  fs.readFileSync(
+    `${__dirname}/_data/${
+      process.env.NODE_ENV == 'production' ? 'users-prod.json' : 'users.json'
+    }`,
+    'utf-8'
+  )
 )
 
 const importData = async () => {
